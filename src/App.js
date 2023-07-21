@@ -1,10 +1,8 @@
 import './App.css';
 import { useState, useEffect } from 'react';
 import socketIOClient from "socket.io-client";
-import { initiateSocket, disconnectSocket,
-  subscribeToChat, sendMessage, createUser } from './socket';
-  import { Button } from 'react-bootstrap';
-  import ListGroup from 'react-bootstrap/ListGroup';
+import { Button } from 'react-bootstrap';
+import ListGroup from 'react-bootstrap/ListGroup';
 
 
 const ENDPOINT = "https://socket-server-tep2.onrender.com";
@@ -28,9 +26,9 @@ function Board({ xIsNext, squares, onPlay, user, connectedUser, nextPlayer }) {
     }
     const nextSquares = squares.slice();
     if (xIsNext) {
-      nextSquares[i] = 'X';
-    } else {
       nextSquares[i] = 'O';
+    } else {
+      nextSquares[i] = 'X';
     }
     onPlay(nextSquares,nextPlayer);
   }
@@ -163,9 +161,7 @@ export default function Game() {
                 <Board xIsNext={xIsNext} squares={currentSquares} onPlay={handlePlay} user={user} connectedUser={connectedUser} nextPlayer={nextPlayer}/>
               </div>
               }
-              <div className="game-info">
-                <ol>{/*TODO*/}</ol>
-              </div>
+            
             </div>
             <div className="col-sm">
             <p>Active Users</p>
