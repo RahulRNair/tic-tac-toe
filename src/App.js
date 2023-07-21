@@ -7,7 +7,7 @@ import { initiateSocket, disconnectSocket,
   import ListGroup from 'react-bootstrap/ListGroup';
 
 
-const ENDPOINT = "http://localhost:5000";
+const ENDPOINT = "https://socket-server-tep2.onrender.com";
 const socket = socketIOClient(ENDPOINT);
 
 
