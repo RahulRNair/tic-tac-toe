@@ -38,12 +38,12 @@ function Board({ xIsNext, squares, onPlay, user, connectedUser, nextPlayer }) {
   if (winner) {
     status = 'Winner: ' + user;
   } else {
-    status = 'Current player: ' + nextPlayer;
+    status = nextPlayer + ' playing';
   }
 
   return (
     <>
-      <div className="status">{status}</div>
+      <div className="status text-info">{status}</div>
       <div className="board-row">
         <Square value={squares[0]} onSquareClick={() => handleClick(0)} />
         <Square value={squares[1]} onSquareClick={() => handleClick(1)} />
@@ -102,11 +102,19 @@ export default function Game() {
     }
    
   }
+  var refresh = e =>{
+    console.log(currentSquares)
+      setcurrentSquares(Array(9).fill(null))
+      setXIsNext(!xIsNext)
+      setnextPlayer(user)
+      socket.emit("userPlay", connectedUser.socketid, Array(9).fill(null), user, !xIsNext, socket.id)
+  }
   var join = (socketid, username) => {
     socket.emit("connectUser", socketid, user, socket.id, xIsNext)
     setisConnected(true)
     setconnectedUser({username,socketid})
     setnextPlayer(user)
+    
   }
 
   useEffect(() => {
@@ -139,13 +147,15 @@ export default function Game() {
   }, []);
 
   return (
-    <div className="container p-0">
+    <div className="container p-0 mt-4">
 
         <div className="container">
           <div className="row">
+            {isUser && <p className="text-dark">Current User : {user}</p>}
+            {!isUser &&
             <div className="col-sm">
               <div>
-              <p>I Am  : {user}</p>
+              
               
               <p>Create User</p>
               <input onChange={ e => {setcurrentUser(e.target.value);setUser(e.target.value) }} value={currentUser} required/>
@@ -155,16 +165,33 @@ export default function Game() {
                   Create User
               </Button>
               </div>
-              {isConnected &&
-              <div className="game-board">
-                <p>Player Connected : {connectedUser.username}</p>
-                <Board xIsNext={xIsNext} squares={currentSquares} onPlay={handlePlay} user={user} connectedUser={connectedUser} nextPlayer={nextPlayer}/>
-              </div>
-              }
+  
             
             </div>
+            }
+            {isConnected &&
             <div className="col-sm">
-            <p>Active Users</p>
+              <div className="game-board">
+                <p className="text-success">Playing with: {connectedUser.username}</p>
+                <Board xIsNext={xIsNext} squares={currentSquares} onPlay={handlePlay} user={user} connectedUser={connectedUser} nextPlayer={nextPlayer}/>
+                <Button variant="secondary" size="sm" onClick={refresh}  className="mt-2 refresh-btn" >
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-clockwise" viewBox="0 0 16 16">
+                  <path fill-rule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z"/>
+                  <path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z"/>
+                </svg>
+                &nbsp;Refresh
+                </Button>
+              </div>
+            </div>
+            }
+            {isUser && rooms.length === 0 && !isConnected &&
+              <div className="alert alert-info" role="alert">
+              There is no active user found to play! Waiting for users...
+              </div>
+            }
+            {!isConnected && rooms.length>0 &&  isUser &&
+            <div className="col-sm">
+            <p className="text-warning">List of Active Users to connect</p>
             {isUser && !isConnected && 
               <ListGroup>
               {rooms.map(function(room,index){
@@ -178,6 +205,7 @@ export default function Game() {
               </ListGroup>
               }
             </div>
+            }
            
           </div>
         </div>
